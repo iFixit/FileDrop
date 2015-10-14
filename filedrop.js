@@ -565,8 +565,8 @@
     // false for any other version/browser.
     // IE 6 on XP SP 3 gives JScript version 5.7 while IE 8 - 5.8.
     // IE 9 on Win7 gives 9.
-    isIE6: /*@cc_on/*@if(@_jscript_version<=5.7)true@else@*/false/*@end@*/,
-    isIE9: /*@cc_on/*@if(@_jscript_version<=9)true@else@*/false/*@end@*/,
+    isIE6: /\bMSIE 6/.test(navigator.userAgent),
+    isIE9: /\bMSIE 9/.test(navigator.userAgent),
 
     // Test for Google Chrome. This isn't used to determine available
     // File API but only to work around certain event glitches.
