@@ -790,11 +790,6 @@
       dragEnd: [],
       dragExit: [],
 
-      //
-      // function (eventObject)
-      paste: [],
-
-
       // Occurs when a file has been dropped on the zone element or when a file
       // was selected in/dropped onto fallback <form> to trigger <iframe> upload.
       // The former occurs in Firefox and Chrome-based browsers that support
@@ -924,6 +919,8 @@
       global.isIE9 || self.delegate(zoneNode, 'drop', 'upload')
     }
 
+    // Attaches a `onpaste` listener to the drop zone that then fires the
+    // upload event.
     self.hookPaste = function (zoneNode) {
       self.delegate(zoneNode, 'paste', 'upload')
     }
