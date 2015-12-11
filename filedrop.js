@@ -2037,8 +2037,8 @@
         // Zero size also indicates that it might be a directory.
         global.hasConsole && console.warn('Trying to send an empty FileDrop.File.')
         // FileReader crashes Chrome for large files. Only use FileReader for
-        // files less than 10MB
-      } else if (self.size < 10000000 && window.FileReader) {
+        // files less than 50MB
+      } else if (self.size < 50000000 && window.FileReader) {
         // Using Firefox FileAPI.
         var reader = new FileReader
 
