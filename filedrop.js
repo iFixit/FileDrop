@@ -1561,12 +1561,13 @@
           types = e.clipboardData.types;
 
       Array.each(types, function(type, i) {
-        if (type.match(matchType) || e.clipboardData.items[i].type.match(matchType)) {
-          var blob = e.clipboardData.items[i].getAsFile();
+        var items = e.clipboardData.items || [];
+        if (type.match(matchType) || items[i].type.match(matchType)) {
+          var blob = items[i].getAsFile();
           var mime = blob.type.replace('image/', '');
           blob.name = 'Pasted-From-Clipboard.' + mime;
           file = new global.File(blob);
-          file.setNativeEntry(e.clipboardData.items[i])
+          file.setNativeEntry(items[i])
           global.callAllOfObject(self, 'fileSetup', file)
           if (file.size > 0 || file.nativeEntry) {
              files.push(file);
