@@ -790,6 +790,11 @@
       dragEnd: [],
       dragExit: [],
 
+      //
+      // function (eventObject)
+      paste: [],
+
+
       // Occurs when a file has been dropped on the zone element or when a file
       // was selected in/dropped onto fallback <form> to trigger <iframe> upload.
       // The former occurs in Firefox and Chrome-based browsers that support
@@ -870,6 +875,7 @@
 
       self.hookDragOn(zoneNode)
       self.hookDropOn(zoneNode)
+      self.hookPaste(zoneNode)
     }
 
     // Attaches listeners for drag events - when an object is moved in or out
@@ -916,6 +922,10 @@
       // Firefox and Chrome-based browsers are the only ones supporting this
       // event which we use to read dropped file data in the FileDrop class.
       global.isIE9 || self.delegate(zoneNode, 'drop', 'upload')
+    }
+
+    self.hookPaste = function (zoneNode) {
+      self.delegate(zoneNode, 'paste', 'upload')
     }
 
     // Listens for DOM events and initiates corresponding DropHandle's events.
@@ -1499,17 +1509,23 @@
     // If orFalse is unset always returns a FileList even if event was invalid,
     // otherwise returns false in such occurrences instead of empty FileList.
     self.eventFiles = function (e, orFalse) {
+      if (e.type === 'paste') {
+         return self.handlePaste(e);
+      }
+
+      var list;
       var result = new global.FileList(e)
+      var dataTransfer = e.dataTransfer;
 
       // IE 8 supplies dataTransfer but it's of its own format (getData(), etc.)
       // and not standardized. Has no file objects.
-      if (e.dataTransfer && (e.dataTransfer.length || e.dataTransfer.files)) {
-        var list = e.dataTransfer
+      if (dataTransfer && (dataTransfer.length || dataTransfer.files)) {
+        list = dataTransfer
       } else {
         // IE 10 provides dataTransfer on drag & drop but when selecting with
         // Open File dialog of <input type="file"> it only has e.srcElement.files.
         // Thanks to @rafaelmaiolla for this correction.
-        var list = (e.target && e.target.files) || (e.srcElement && e.srcElement.files)
+        list = (e.target && e.target.files) || (e.srcElement && e.srcElement.files)
       }
 
       if (list) {
@@ -1539,6 +1555,28 @@
       }
 
       return result
+    }
+
+    self.handlePaste = function(e) {
+      var file,
+          files = new global.FileList(e),
+          matchType = /image.*/,
+          types = e.clipboardData.types;
+
+      Array.each(types, function(type, i) {
+        if (type.match(matchType) || e.clipboardData.items[i].type.match(matchType)) {
+          var blob = e.clipboardData.items[i].getAsFile();
+          var mime = blob.type.replace('image/', '');
+          blob.name = 'Pasted-From-Clipboard.' + mime;
+          file = new global.File(blob);
+          file.setNativeEntry(e.clipboardData.items[i])
+          global.callAllOfObject(self, 'fileSetup', file)
+          if (file.size > 0 || file.nativeEntry) {
+             files.push(file);
+          }
+        }
+      });
+      return files;
     }
 
     // Linking both classes together. Objects become references so changing,
