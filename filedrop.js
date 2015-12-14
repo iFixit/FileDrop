@@ -1567,8 +1567,8 @@
           var mime = blob.type.replace('image/', '');
           blob.name = 'Pasted-From-Clipboard.' + mime;
           file = new global.File(blob);
-          file.setNativeEntry(items[i])
-          global.callAllOfObject(self, 'fileSetup', file)
+          file.setNativeEntry(items[i]);
+          global.callAllOfObject(self, 'fileSetup', file);
           if (file.size > 0 || file.nativeEntry) {
              files.push(file);
           }
