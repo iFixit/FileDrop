@@ -2241,7 +2241,7 @@
       })
 
       if (!window.FileReader) {
-        return error('support', e)
+        return error('support', {message:'FileReader not defined'})
       }
 
       if (opt.start > 0 || opt.end != null && opt.end) {
