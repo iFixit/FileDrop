@@ -403,7 +403,7 @@
   // Appends event listeners to given object with 'events' property according
   // to passed parameters. See DropHandle.event() for details.
   // 'this' must be set to the object which events are updated.
-  global.appendEventsToObject = function (events, funcs) {
+  global.appendEventsToObject = function appendEventsToObject(events, funcs) {
     if (global.addEventsToObject(this, false, arguments)) {
       return this
     }
@@ -439,7 +439,7 @@
 
           if (!ns[0]) {
             for (var event in this.events) {
-              arguments.callee.call(this, [event + ':' + ns[1]], null)
+              appendEventsToObject.call(this, [event + ':' + ns[1]], null)
             }
           } else if (!ns[1]) {
             this.events[ns[0]] = []
@@ -473,7 +473,7 @@
   // Adds event listeners to given object with 'events' property according
   // to passed parameters. See DropHandle.event() for details.
   // Returns nothing if couldn't handle given parameter combination.
-  global.addEventsToObject = function (obj, prepend, args) {
+  global.addEventsToObject = function addEventsToObject(obj, prepend, args) {
     var events = args[0]
     var funcs = args[1]
 
@@ -481,7 +481,7 @@
     case 1:
       if (events && typeof events == 'object' && !global.isArray(events)) {
         for (var event in events) {
-          arguments.callee(obj, prepend, [event, events[event]])
+          addEventsToObject(obj, prepend, [event, events[event]])
         }
 
         return true
@@ -982,14 +982,14 @@
     //    //=> <input type="file" class="fd-input">
     //
     //? findInputRecursive(byID('foo'))   //=> null
-    self.findInputRecursive = function (parent) {
+    self.findInputRecursive = function findInputRecursive(parent) {
       for (var i = 0; i < parent.childNodes.length; i++) {
         var node = parent.childNodes[i]
 
         if (global.isTag(node, 'input') && node.getAttribute('type') == 'file' &&
             global.hasClass(node, self.opt.inputClass)) {
           return node
-        } else if (node = arguments.callee(node)) {
+        } else if (node = findInputRecursive(node)) {
           return node
         }
       }
@@ -2337,7 +2337,7 @@
           }
         }
 
-        reader.readEntries(function (list) {
+        reader.readEntries(function readList(list) {
           for (var i = 0; i < list.length; i++) {
             var nativeEntry = list[i]
 
@@ -2369,7 +2369,7 @@
             }
           }
 
-          i ? reader.readEntries(arguments.callee, onError) : dequeue(0)
+          i ? reader.readEntries(readList, onError) : dequeue(0)
         }, onError)
 
         return true
